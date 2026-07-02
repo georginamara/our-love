@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Our Love Story</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Quicksand:wght@300;400;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: #fce4ec;
+      color: #4a2c2a;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #fce4ec; }
+    ::-webkit-scrollbar-thumb { background: #e8a0b4; border-radius: 3px; }
+
+    /* ── Envelope / Letter ── */
+    .envelope-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      cursor: pointer;
+    }
+    .envelope-screen.hidden {
+      opacity: 0;
+      transform: scale(1.05);
+      pointer-events: none;
+    }
+
+    .envelope {
+      position: relative;
+      width: 320px;
+      height: 240px;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .env-body {
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 80%;
+      background: #f48fb1;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    .env-flap {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 55%;
+      background: #f06292;
+      clip-path: polygon(0 0, 50% 100%, 100% 0);
+      border-radius: 12px 12px 0 0;
+      transform-origin: top center;
+      transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      z-index: 2;
+    }
+    .envelope-screen.opened .env-flap {
+      transform: rotateX(180deg);
+    }
+
+    .env-heart {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      z-index: 3;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
+      animation: heartbeat 1.5s ease-in-out infinite;
+      transition: opacity 0.4s ease;
+    }
+    .envelope-screen.opened .env-heart {
+      opacity: 0;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.15); }
+    }
+
+    .env-label {
+      position: absolute;
+      bottom: -36px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      color: #ad5a6e;
+      white-space: nowrap;
+      letter-spacing: 1px;
+      opacity: 0.8;
+    }
+
+    .confetti-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      overflow: hidden;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 10px; height: 10px;
+      opacity: 0;
+      animation: confettiFall 3s ease-out forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── Main Content ── */
+    .main-content {
+      opacity: 0;
+      transition: opacity 0.8s ease 0.3s;
+      padding: 40px 20px 80px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .main-content.visible { opacity: 1; }
+
+    /* ── Love Letter ── */
+    .letter-section {
+      background: #fff8f8;
+      border-radius: 24px;
+      padding: 48px 36px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 24px rgba(244,143,177,0.15);
+      position: relative;
+    }
+    .letter-section::before {
+      content: '💌';
+      position: absolute;
+      top: -18px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 32px;
+    }
+    .letter-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      color: #c2185b;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .letter-section .sub {
+      text-align: center;
+      color: #b06d7a;
+      font-size: 14px;
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .letter-section p {
+      font-size: 17px;
+      line-height: 1.8;
+      color: #5a3a3a;
+      margin-bottom: 16px;
+      text-align: justify;
+    }
+    .letter-section .signature {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      text-align: right;
+      font-size: 20px;
+      color: #c2185b;
+      margin-top: 24px;
+    }
+
+    /* ── Music Player ── */
+    .music-section {
+      background: #fff8f8;
+      border-radius: 24px;
+      padding: 32px 36px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 24px rgba(244,143,177,0.15);
+    }
+    .music-section h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: #c2185b;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .music-player {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .music-player button {
+      background: #f48fb1;
+      border: none;
+      color: white;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .music-player button:hover {
+      background: #f06292;
+      transform: scale(1.05);
+    }
+    .music-player .track-info {
+      flex: 1;
+      min-width: 160px;
+      text-align: center;
+    }
+    .music-player .track-name {
+      font-weight: 600;
+      color: #4a2c2a;
+      font-size: 15px;
+    }
+    .music-player .track-artist {
+      font-size: 13px;
+      color: #b06d7a;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #fce4ec;
+      border-radius: 2px;
+      margin-top: 12px;
+      cursor: pointer;
+      position: relative;
+    }
+    .progress-bar .fill {
+      height: 100%;
+      background: linear-gradient(90deg, #f48fb1, #c2185b);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    .music-controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    /* ── Messages ── */
+    .messages-section {
+      background: #fff8f8;
+      border-radius: 24px;
+      padding: 32px 36px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 24px rgba(244,143,177,0.15);
+    }
+    .messages-section h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: #c2185b;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .message-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .message-form input,
+    .message-form textarea {
+      font-family: 'Quicksand', sans-serif;
+      padding: 12px 16px;
+      border: 2px solid #f8bbd0;
+      border-radius: 12px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.3s;
+      background: #fff;
+      resize: vertical;
+    }
+    .message-form input:focus,
+    .message-form textarea:focus {
+      border-color: #f48fb1;
+    }
+    .message-form textarea {
+      min-height: 80px;
+    }
+    .message-form button {
+      align-self: flex-end;
+      background: #f48fb1;
+      color: white;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 20px;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .message-form button:hover {
+      background: #f06292;
+      transform: scale(1.02);
+    }
+
+    .messages-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .message-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 16px 20px;
+      box-shadow: 0 2px 12px rgba(244,143,177,0.1);
+      animation: fadeSlideUp 0.4s ease;
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .message-card .msg-from {
+      font-weight: 600;
+      color: #c2185b;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .message-card .msg-text {
+      color: #4a2c2a;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .message-card .msg-date {
+      font-size: 11px;
+      color: #b06d7a;
+      margin-top: 8px;
+      text-align: right;
+    }
+    .message-card .delete-msg {
+      background: none;
+      border: none;
+      color: #e8a0b4;
+      cursor: pointer;
+      font-size: 13px;
+      float: right;
+      transition: color 0.2s;
+    }
+    .message-card .delete-msg:hover { color: #c2185b; }
+
+    .empty-msg {
+      text-align: center;
+      color: #b06d7a;
+      font-style: italic;
+      padding: 20px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 13px;
+      color: #b06d7a;
+    }
+    .footer .heart { color: #e91e63; }
+
+    /* ── Responsive ── */
+    @media (max-width: 540px) {
+      .letter-section { padding: 36px 20px; }
+      .letter-section h2 { font-size: 24px; }
+      .music-section { padding: 24px 20px; }
+      .messages-section { padding: 24px 20px; }
+      .envelope { width: 240px; height: 180px; }
+      .env-heart { font-size: 36px; }
+    }
+
+    /* ── Google Fonts fallback ── */
+    .wf-loading body { opacity: 0; }
+    .wf-active body, .wf-inactive body { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Envelope ─── -->
+  <div class="envelope-screen" id="envelopeScreen">
+    <div class="envelope">
+      <div class="env-body"></div>
+      <div class="env-flap"></div>
+      <div class="env-heart">💖</div>
+      <div class="env-label">click to open &nbsp;✦</div>
+    </div>
+  </div>
+
+  <!-- ─── Confetti container ─── -->
+  <div class="confetti-container" id="confettiContainer"></div>
+
+  <!-- ─── Main Content ─── -->
+  <div class="main-content" id="mainContent">
+
+    <!-- Letter -->
+    <section class="letter-section">
+      <h2 id="loveTitle">My Dearest Love</h2>
+      <div class="sub" id="loveSub">A letter from the heart</div>
+      <p id="letterP1">
+        Every moment with you feels like a beautiful dream I never want to wake up from. 
+        From the way your eyes light up when you laugh to the warmth of your hand in mine — 
+        you've become my favorite place to be.
+      </p>
+      <p id="letterP2">
+        This little corner of the internet is ours — a place where memories live, 
+        where love grows, and where we can always come back to remember just how 
+        magical this journey is. Thank you for being you. Thank you for being mine.
+      </p>
+      <div class="signature" id="letterSig">Forever yours</div>
+    </section>
+
+    <!-- Music Player -->
+    <section class="music-section">
+      <h3>🎵 Our Song</h3>
+      <div class="music-player">
+        <button id="prevBtn" title="Previous">⏮</button>
+        <button id="playBtn" title="Play / Pause">▶</button>
+        <button id="nextBtn" title="Next">⏭</button>
+        <div class="track-info">
+          <div class="track-name" id="trackName">Song Title</div>
+          <div class="track-artist" id="trackArtist">Artist Name</div>
+        </div>
+      </div>
+      <div class="progress-bar" id="progressBar">
+        <div class="fill" id="progressFill"></div>
+      </div>
+      <div class="music-controls">
+        <button id="loopBtn" title="Loop" style="background:#e8a0b4;font-size:14px;width:auto;padding:0 16px;border-radius:20px;">🔁 Loop</button>
+      </div>
+    </section>
+
+    <!-- Messages -->
+    <section class="messages-section">
+      <h3>💬 Love Notes</h3>
+      <div class="message-form">
+        <input type="text" id="msgFrom" placeholder="Your name (e.g. Alex)" />
+        <textarea id="msgText" placeholder="Write a sweet note..."></textarea>
+        <button id="sendMsg">Send with love 💌</button>
+      </div>
+      <div class="messages-list" id="messagesList">
+        <div class="empty-msg">No notes yet. Write the first one! 💕</div>
+      </div>
+    </section>
+
+    <div class="footer">
+      made with <span class="heart">♥</span> for you
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════
+    //  CONFIG — Edit this to personalize!
+    // ═══════════════════════════════════════
+    const CONFIG = {
+      // ── Love Letter ──
+      title: "My Dearest Love",
+      subtitle: "A letter from the heart",
+      paragraph1: `Every moment with you feels like a beautiful dream I never want to wake up from. From the way your eyes light up when you laugh to the warmth of your hand in mine — you've become my favorite place to be.`,
+      paragraph2: `This little corner of the internet is ours — a place where memories live, where love grows, and where we can always come back to remember just how magical this journey is. Thank you for being you. Thank you for being mine.`,
+      signature: "Forever yours",
+
+      // ── Music Playlist ──
+      // Add your own tracks! Supported: any audio URL (MP3, etc.)
+      tracks: [
+        { name: "Perfect", artist: "Ed Sheeran", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
+        { name: "A Thousand Years", artist: "Christina Perri", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" },
+        { name: "All of Me", artist: "John Legend", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" }
+      ],
+      loopPlaylist: true,
+
+      // ── Messages ──
+      // Messages are saved in your browser (localStorage)
+      storageKey: "couples_messages"
+    };
+
+    // ═══════════════════════════════════════
+    //  ENVELOPE
+    // ═══════════════════════════════════════
+    const envelopeScreen = document.getElementById('envelopeScreen');
+    const mainContent = document.getElementById('mainContent');
+    const confettiContainer = document.getElementById('confettiContainer');
+
+    envelopeScreen.addEventListener('click', () => {
+      if (envelopeScreen.classList.contains('opened')) return;
+      envelopeScreen.classList.add('opened');
+      spawnConfetti();
+      setTimeout(() => {
+        envelopeScreen.classList.add('hidden');
+        mainContent.classList.add('visible');
+      }, 700);
+    });
+
+    function spawnConfetti() {
+      const colors = ['#f48fb1','#f06292','#e91e63','#c2185b','#ffb74d','#fff176','#ce93d8'];
+      for (let i = 0; i < 60; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = (Math.random() * 6 + 4) + 'px';
+        piece.style.height = (Math.random() * 6 + 4) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        piece.style.animationDelay = (Math.random() * 0.5) + 's';
+        confettiContainer.appendChild(piece);
+        setTimeout(() => piece.remove(), 3500);
+      }
+    }
+
+    // ═══════════════════════════════════════
+    //  LOVE LETTER
+    // ═══════════════════════════════════════
+    document.getElementById('loveTitle').textContent = CONFIG.title;
+    document.getElementById('loveSub').textContent = CONFIG.subtitle;
+    document.getElementById('letterP1').textContent = CONFIG.paragraph1;
+    document.getElementById('letterP2').textContent = CONFIG.paragraph2;
+    document.getElementById('letterSig').textContent = CONFIG.signature;
+
+    // ═══════════════════════════════════════
+    //  MUSIC PLAYER
+    // ═══════════════════════════════════════
+    const audio = new Audio();
+    let currentTrack = 0;
+    let isPlaying = false;
+    let isLooping = CONFIG.loopPlaylist;
+
+    const playBtn = document.getElementById('playBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const loopBtn = document.getElementById('loopBtn');
+    const trackName = document.getElementById('trackName');
+    const trackArtist = document.getElementById('trackArtist');
+    const progressFill = document.getElementById('progressFill');
+    const progressBar = document.getElementById('progressBar');
+
+    function loadTrack(index) {
+      const track = CONFIG.tracks[index];
+      if (!track) return;
+      audio.src = track.url;
+      trackName.textContent = track.name;
+      trackArtist.textContent = track.artist;
+      audio.load();
+      if (isPlaying) audio.play();
+    }
+
+    function playPause() {
+      if (!CONFIG.tracks.length) return;
+      if (isPlaying) {
+        audio.pause();
+        playBtn.textContent = '▶';
+      } else {
+        audio.play().catch(() => {});
+        playBtn.textContent = '⏸';
+      }
+      isPlaying = !isPlaying;
+    }
+
+    function nextTrack() {
+      if (!CONFIG.tracks.length) return;
+      currentTrack = (currentTrack + 1) % CONFIG.tracks.length;
+      loadTrack(currentTrack);
+      if (isPlaying) audio.play();
+    }
+
+    function prevTrack() {
+      if (!CONFIG.tracks.length) return;
+      currentTrack = (currentTrack - 1 + CONFIG.tracks.length) % CONFIG.tracks.length;
+      loadTrack(currentTrack);
+      if (isPlaying) audio.play();
+    }
+
+    playBtn.addEventListener('click', playPause);
+    prevBtn.addEventListener('click', prevTrack);
+    nextBtn.addEventListener('click', nextTrack);
+
+    loopBtn.addEventListener('click', () => {
+      isLooping = !isLooping;
+      audio.loop = isLooping;
+      loopBtn.style.background = isLooping ? '#f48fb1' : '#e8a0b4';
+    });
+    audio.loop = isLooping;
+    loopBtn.style.background = isLooping ? '#f48fb1' : '#e8a0b4';
+
+    audio.addEventListener('timeupdate', () => {
+      if (audio.duration) {
+        progressFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+      }
+    });
+
+    progressBar.addEventListener('click', (e) => {
+      const rect = progressBar.getBoundingClientRect();
+      const pct = (e.clientX - rect.left) / rect.width;
+      audio.currentTime = pct * audio.duration;
+    });
+
+    audio.addEventListener('ended', () => {
+      if (!audio.loop) nextTrack();
+    });
+
+    audio.addEventListener('play', () => { isPlaying = true; playBtn.textContent = '⏸'; });
+    audio.addEventListener('pause', () => { isPlaying = false; playBtn.textContent = '▶'; });
+
+    // Init first track
+    if (CONFIG.tracks.length) loadTrack(0);
+
+    // ═══════════════════════════════════════
+    //  MESSAGES (localStorage)
+    // ═══════════════════════════════════════
+    const msgFrom = document.getElementById('msgFrom');
+    const msgText = document.getElementById('msgText');
+    const sendBtn = document.getElementById('sendMsg');
+    const messagesList = document.getElementById('messagesList');
+
+    function getMessages() {
+      try {
+        return JSON.parse(localStorage.getItem(CONFIG.storageKey)) || [];
+      } catch { return []; }
+    }
+
+    function saveMessages(msgs) {
+      localStorage.setItem(CONFIG.storageKey, JSON.stringify(msgs));
+    }
+
+    function renderMessages() {
+      const msgs = getMessages();
+      messagesList.innerHTML = '';
+      if (!msgs.length) {
+        messagesList.innerHTML = '<div class="empty-msg">No notes yet. Write the first one! 💕</div>';
+        return;
+      }
+      msgs.reverse().forEach((m, idx) => {
+        const card = document.createElement('div');
+        card.className = 'message-card';
+        card.innerHTML = `
+          <button class="delete-msg" data-idx="${msgs.length - 1 - idx}">✕</button>
+          <div class="msg-from">${escapeHtml(m.from || 'Anonymous')}</div>
+          <div class="msg-text">${escapeHtml(m.text)}</div>
+          <div class="msg-date">${m.date}</div>
+        `;
+        messagesList.appendChild(card);
+      });
+      document.querySelectorAll('.delete-msg').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.idx);
+          const all = getMessages();
+          all.splice(idx, 1);
+          saveMessages(all);
+          renderMessages();
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    sendBtn.addEventListener('click', () => {
+      const from = msgFrom.value.trim() || 'Anonymous';
+      const text = msgText.value.trim();
+      if (!text) return;
+      const msgs = getMessages();
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      msgs.push({ from, text, date: dateStr });
+      saveMessages(msgs);
+      msgText.value = '';
+      renderMessages();
+    });
+
+    renderMessages();
+  </script>
+</body>
+</html>
