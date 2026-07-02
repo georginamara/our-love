@@ -173,7 +173,38 @@
       text-align: right;
       font-size: 20px;
       color: #c2185b;
-      margin-top: 24px;
+    }
+    .sticker-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .matcha-sticker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #e8f5e9;
+      border: 2px dashed #81c784;
+      border-radius: 30px;
+      padding: 6px 18px 6px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #2e7d32;
+      transform: rotate(-3deg);
+      box-shadow: 0 2px 12px rgba(129,199,132,0.25);
+      animation: stickerFloat 3s ease-in-out infinite;
+    }
+    .matcha-sticker span {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+    @keyframes stickerFloat {
+      0%, 100% { transform: rotate(-3deg) translateY(0); }
+      50% { transform: rotate(-3deg) translateY(-4px); }
     }
 
     .music-section {
@@ -323,12 +354,15 @@
         That's why I wanted to make something like this. A small place where we can keep the moments we've shared, no matter how ordinary they seem right now. Because I have a feeling that one day, we'll look back at all of this and realize these were the moments that quietly became our favorites.
       </p>
       <p id="letterP4">
-        Thank you for being someone who makes life feel lighter, happier, and a little more beautiful just by being in it. I hope this is only the beginning, and that we get to fill this little space with even more memories we'll never want to forget.
+Thank you for being someone who makes life feel lighter, happier, and a little more beautiful just by being in it. No pressure, no expectations—I just hope we keep making memories together, one day at a time.
       </p>
       <p id="letterP5">
         I can't wait for all the moments we haven't made yet, baby. 🤍
       </p>
-      <div class="signature" id="letterSig">Georgi</div>
+      <div class="sticker-row">
+        <div class="matcha-sticker">🍵<span>matcha lover</span></div>
+        <div class="signature" id="letterSig">Georgi</div>
+      </div>
     </section>
 
     <div class="footer">
@@ -343,7 +377,7 @@
       paragraph1: `I honestly never expected someone to become this important to me. What started as simple conversations and random little moments slowly turned into something I look forward to every single day. Somewhere along the way, without even realizing it, you became my favorite person to talk to.`,
       paragraph2: `One of the things I love most about us is how easy everything feels. Nothing ever has to be perfect. Just being with you, talking to you, or even sharing the smallest moments somehow makes my day better. It's funny how the little things you do—things you probably don't even notice—end up meaning the most to me.`,
       paragraph3: `That's why I wanted to make something like this. A small place where we can keep the moments we've shared, no matter how ordinary they seem right now. Because I have a feeling that one day, we'll look back at all of this and realize these were the moments that quietly became our favorites.`,
-      paragraph4: `Thank you for being someone who makes life feel lighter, happier, and a little more beautiful just by being in it. I hope this is only the beginning, and that we get to fill this little space with even more memories we'll never want to forget.`,
+      paragraph4: `Thank you for being someone who makes life feel lighter, happier, and a little more beautiful just by being in it. No pressure, no expectations—I just hope we keep making memories together, one day at a time.`,
       paragraph5: `I can't wait for all the moments we haven't made yet, baby. 🤍`,
       signature: "Georgi",
       youtubeId: "CFldhT56kjY",
