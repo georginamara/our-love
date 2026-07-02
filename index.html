@@ -295,6 +295,21 @@
 
   <div class="main-content" id="mainContent">
 
+    <section class="music-section">
+      <h3>🎵 Our Song</h3>
+      <div class="music-player">
+        <button id="playBtn" title="Play / Pause">▶</button>
+        <div class="track-info">
+          <div class="track-name" id="trackName">14</div>
+          <div class="track-artist" id="trackArtist">Silent Sanctuary</div>
+        </div>
+      </div>
+      <div id="youtube-player"></div>
+      <div class="progress-bar" id="progressBar">
+        <div class="fill" id="progressFill"></div>
+      </div>
+    </section>
+
     <section class="letter-section">
       <h2 id="loveTitle">Hi madam baby!</h2>
       <div class="sub" id="loveSub">A letter from the heart</div>
@@ -314,21 +329,6 @@
         I can't wait for all the moments we haven't made yet, baby. 🤍
       </p>
       <div class="signature" id="letterSig">Georgi</div>
-    </section>
-
-    <section class="music-section">
-      <h3>🎵 Our Song</h3>
-      <div class="music-player">
-        <button id="playBtn" title="Play / Pause">▶</button>
-        <div class="track-info">
-          <div class="track-name" id="trackName">14</div>
-          <div class="track-artist" id="trackArtist">Silent Sanctuary</div>
-        </div>
-      </div>
-      <div id="youtube-player"></div>
-      <div class="progress-bar" id="progressBar">
-        <div class="fill" id="progressFill"></div>
-      </div>
     </section>
 
     <div class="footer">
@@ -359,6 +359,12 @@
       if (envelopeScreen.classList.contains('opened')) return;
       envelopeScreen.classList.add('opened');
       spawnConfetti();
+      if (playerReady) {
+        player.seekTo(CONFIG.startSec);
+        player.playVideo();
+      } else {
+        pendingPlay = true;
+      }
       setTimeout(() => {
         envelopeScreen.classList.add('hidden');
         mainContent.classList.add('visible');
@@ -397,6 +403,8 @@
     firstScript.parentNode.insertBefore(tag, firstScript);
 
     let player;
+    let playerReady = false;
+    let pendingPlay = false;
     let isPlaying = false;
     let seekTimer = null;
     const playBtn = document.getElementById('playBtn');
@@ -426,7 +434,13 @@
     }
 
     function onPlayerReady() {
+      playerReady = true;
       player.setVolume(70);
+      if (pendingPlay) {
+        player.seekTo(CONFIG.startSec);
+        player.playVideo();
+        pendingPlay = false;
+      }
     }
 
     function onPlayerStateChange(event) {
